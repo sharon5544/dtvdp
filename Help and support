@@ -1,2 +1,8 @@
 Severity	Code	Description	Project	File	Line	Suppression State
-Error	XDG-0001	The resource "Locator" could not be resolved.	DTVPDProject	C:\Users\2021509\C2504_cs\c2504_cs\dtvpd\DTVPDProjectsln\DTVPDProject\Pages\HelpandSupportWindow.xaml	10	
+Error	XLS0414	The type 'charting:Chart' was not found. Verify that you are not missing an assembly reference and that all referenced assemblies have been built.	DTVPDProject	C:\Users\2021509\C2504_cs\c2504_cs\dtvpd\DTVPDProjectsln\DTVPDProject\Pages\PerformanceAnalysisWindow.xaml	60	
+Error	XDG0006	The namespace prefix "charting" is not defined.	DTVPDProject	C:\Users\2021509\C2504_cs\c2504_cs\dtvpd\DTVPDProjectsln\DTVPDProject\Pages\PerformanceAnalysisWindow.xaml	56	
+Error	XDG0008	Chart is not supported in a Windows Presentation Foundation (WPF) project.	DTVPDProject	C:\Users\2021509\C2504_cs\c2504_cs\dtvpd\DTVPDProjectsln\DTVPDProject\Pages\PerformanceAnalysisWindow.xaml	56	
+Error	XLS0414	The type 'charting:Chart' was not found. Verify that you are not missing an assembly reference and that all referenced assemblies have been built.	DTVPDProject	C:\Users\2021509\C2504_cs\c2504_cs\dtvpd\DTVPDProjectsln\DTVPDProject\Pages\PerformanceAnalysisWindow.xaml	56	
+Error		''charting' is an undeclared prefix. Line 56, position 18.' XML is not valid.	DTVPDProject	C:\Users\2021509\C2504_cs\c2504_cs\dtvpd\DTVPDProjectsln\DTVPDProject\Pages\PerformanceAnalysisWindow.xaml	56	
+Error	XDG0006	The namespace prefix "charting" is not defined.	DTVPDProject	C:\Users\2021509\C2504_cs\c2504_cs\dtvpd\DTVPDProjectsln\DTVPDProject\Pages\PerformanceAnalysisWindow.xaml	60	
+Error	XDG0008	Chart is not supported in a Windows Presentation Foundation (WPF) project.	DTVPDProject	C:\Users\2021509\C2504_cs\c2504_cs\dtvpd\DTVPDProjectsln\DTVPDProject\Pages\PerformanceAnalysisWindow.xaml	60	

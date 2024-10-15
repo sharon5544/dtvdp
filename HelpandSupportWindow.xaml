@@ -1,0 +1,51 @@
+﻿<Window x:Class="DTVPDProject.Pages.HelpandSupportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DTVPDProject.Pages"
+        mc:Ignorable="d"
+        Title="Help and Support" Height="600" Width="800"
+        
+        DataContext="{Binding HelpAndSupportViewModel, Source={StaticResource Locator}}">
+
+    <Grid>
+        <!-- Header Text -->
+        <TextBlock Text="Help and Support" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="10"/>
+
+        <!-- TabControl for FAQs, Guides, and Tutorials -->
+        <TabControl Margin="10,50,10,10">
+            <!-- FAQs Tab -->
+            <TabItem Header="FAQs">
+                <StackPanel>
+                    <Button Content="Show FAQs" Margin="10" Command="{Binding ShowFAQsCommand}"/>
+                    <TextBlock Text="{Binding FAQDescription}" Margin="20,10,0,0" Visibility="{Binding IsFAQVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Guides Tab -->
+            <TabItem Header="User Guides">
+                <StackPanel>
+                    <Button Content="Show Guides" Margin="10" Command="{Binding ShowGuidesCommand}"/>
+                    <TextBlock Text="{Binding GuideDescription}" Margin="20,10,0,0" Visibility="{Binding IsGuideVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Tutorials Tab -->
+            <TabItem Header="Tutorials">
+                <StackPanel>
+                    <Button Content="Show Tutorials" Margin="10" Command="{Binding ShowTutorialsCommand}"/>
+                    <TextBlock Text="{Binding TutorialDescription}" Margin="20,10,0,0" Visibility="{Binding IsTutorialVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+
+        <!-- Technical Support Section -->
+        <TextBlock Text="Contact Technical Support" FontSize="18" FontWeight="Bold" Margin="10,370,0,0"/>
+        <TextBlock Text="Email: support@yourapp.com" Margin="20,400,0,0"/>
+        <TextBlock Text="Phone: +1-234-567-890" Margin="20,420,0,0"/>
+
+        <!-- Footer Section -->
+        <TextBlock Text="For more information, please visit our website: www.yourapp.com" Margin="10,460,0,0"/>
+    </Grid>
+</Window>

@@ -1,0 +1,51 @@
+﻿<Window x:Class="DTVPDProject.Pages.PerformanceAnalysisWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:helix="http://helix-toolkit.org/wpf"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DTVPDProject.Pages"
+        mc:Ignorable="d"
+        Title="PerformanceAnalysisPageWindow" Height="621" Width="826" Closing="Window_Closing">
+
+
+    <Grid>
+        <!-- Header Text -->
+        <TextBlock Text="Performance Analysis" TextAlignment="Center" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,560" Width="806" Background="#FF33A65B"/>
+
+        <!-- TextBlock to load line chart -->
+        <TextBlock Text="Click to Load Line Chart" FontSize="14" Margin="10,50,0,0"
+                   MouseDown="LoadLineChart_Click" Cursor="Hand"/>
+
+        <!-- TextBlock to load pie chart -->
+        <TextBlock Text="Click to Load Pie Chart" FontSize="14" Margin="10,80,0,0"
+                   MouseDown="LoadPieChart_Click" Cursor="Hand"/>
+
+        <!-- Button to load 3D model -->
+        <Button Content="Load 3D Model" Width="150" Height="30"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Margin="198,60,0,0" Click="Load3DModelButton_Click" Background="#FFDFEB54" FontWeight="Bold"/>
+
+        <!-- Line Chart area -->
+        <lvc:CartesianChart Name="lineChart"
+                            Series="{Binding LineChartSeries}"
+                            AxisX="{Binding LineChartXAxis}"
+                            AxisY="{Binding LineChartYAxis}"
+                            HorizontalAlignment="Left" VerticalAlignment="Top"
+                            Width="334" Height="217" Margin="31,126,0,0"/>
+
+        <!-- Pie Chart area -->
+        <lvc:PieChart Name="pieChart"
+                      Series="{Binding PieChartSeries}"
+                      HorizontalAlignment="Left" VerticalAlignment="Top"
+                      Width="400" Height="224" Margin="198,374,0,0"/>
+
+        <!-- 3D Rendering Area -->
+        <helix:HelixViewport3D Name="viewport3D"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Top"
+                               Width="359" Height="218" Margin="0,125,32,0"/>
+    </Grid>
+</Window>
+

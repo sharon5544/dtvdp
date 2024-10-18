@@ -430,7 +430,7 @@ PerformanceAnalysisWindow.xaml
         xmlns:helix="http://helix-toolkit.org/wpf"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"     
         xmlns:local="clr-namespace:DTVPDProject.Pages"
-        Title="PerformanceAnalysisPageWindow" Height="590" Width="826" Closing="Window_Closing" WindowState="Maximized">
+        Title="PerformanceAnalysisPageWindow" Height="590" Width="826" WindowState="Maximized" Closing="Window_Closing">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -449,6 +449,8 @@ PerformanceAnalysisWindow.xaml
             <TextBlock>Start Time: <Run Text="{Binding StartTime}"/></TextBlock>
             <TextBlock>End Time: <Run Text="{Binding EndTime}"/></TextBlock>
             <TextBlock>Status: <Run Text="{Binding Status}"/></TextBlock>
+            <TextBlock Text="{Binding Status}" />
+            
         </StackPanel>
 
         <!-- Performance Metrics -->
@@ -457,8 +459,23 @@ PerformanceAnalysisWindow.xaml
                 <DataGridTextColumn Header="Metric  Name" Binding="{Binding MetricName}"/>
                 <DataGridTextColumn Header="Metric Value" Binding="{Binding MetricValue}"/>
                 <DataGridTextColumn Header="Unit" Binding="{Binding Unit}"/>
+                
             </DataGrid.Columns>
         </DataGrid>
+
+        <!-- Binding Metrics --><!--
+        <ListBox ItemsSource="{Binding Metrics}" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding MetricName}" Margin="5"/>
+                        <TextBlock Text="{Binding MetricValue}" Margin="5"/>
+                        <Button Content="Select" Click="OnMetricSelect_Click" CommandParameter="{Binding}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>-->
+
 
         <!-- Interactive Visualizations -->
         <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="10,10,10,10">
@@ -467,10 +484,10 @@ PerformanceAnalysisWindow.xaml
                 <RowDefinition Height="165*"/>
             </Grid.RowDefinitions>
             <StackPanel Grid.RowSpan="2" Margin="2,0,0,5">
-                <Button x:Name="btnLineChart" Content="Show Line Chart" Click="btnLineChart_Click"/>
-                <Button x:Name="btnBarChart" Content="Show Bar Chart" Click="btnBarChart_Click"/>
-                <Button x:Name="btnThreeD" Content="Show 3D Rendering" Click="btnThreeD_Click"/>
-
+                <Button x:Name="btnLineChartPerformance" Content="Show Line Chart" Click="btnLineChartPerformance_Click"/>
+                <Button x:Name="btnBarChartPerformance" Content="Show Bar Chart" Click="btnBarChartPerformance_Click"/>
+                <Button x:Name="btnThreeDPerformance" Content="Show 3D Rendering" Click="btnThreeDPerformance_Click"/>
+                <Button x:Name="btnSelect" Content="Select" CommandParameter="{Binding}" Click="btnSelect_Click"/>
                 <!-- LiveCharts Chart -->
                 <lvc:CartesianChart x:Name="cartesianChart" Width="386" Height="255" />
                 <helix:HelixViewport3D x:Name="viewport" Width="384" Height="226"/>
@@ -482,7 +499,6 @@ PerformanceAnalysisWindow.xaml
 
 
 </Window>
-
 PerformanceAnalysisWindow.xaml.cs
 ---------------------------------
 using System;
@@ -503,6 +519,8 @@ using LiveCharts.Wpf;
 using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf;
 using DTVPDProject.ViewModels;
+using System.Collections.ObjectModel;
+using LiveCharts.Definitions.Charts;
 
 namespace DTVPDProject.Pages
 {
@@ -518,17 +536,10 @@ namespace DTVPDProject.Pages
 
         }
 
-       
-           
 
-       
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-
-        }
-
-        private void btnLineChart_Click(object sender, RoutedEventArgs e)
+        private void btnLineChartPerformance_Click(object sender, RoutedEventArgs e)
+        
         {
             // Example data for the line chart
             var values = new ChartValues<double> { 3, 5, 7, 4 };
@@ -541,8 +552,9 @@ namespace DTVPDProject.Pages
             cartesianChart.Series.Add(lineSeries);
         }
 
-        private void btnBarChart_Click(object sender, RoutedEventArgs e)
+        private void btnBarChartPerformance_Click(object sender, RoutedEventArgs e)
         {
+
             // Example data for the bar chart
             var values = new ChartValues<double> { 4, 6, 3, 8 };
             var barSeries = new ColumnSeries
@@ -554,7 +566,7 @@ namespace DTVPDProject.Pages
             cartesianChart.Series.Add(barSeries);
         }
 
-        private void btnThreeD_Click(object sender, RoutedEventArgs e)
+        private void btnThreeDPerformance_Click(object sender, RoutedEventArgs e)
         {
             // Clear previous 3D content
             viewport.Children.Clear();
@@ -586,8 +598,27 @@ namespace DTVPDProject.Pages
             viewport.Camera.LookDirection = new Vector3D(-1, -1, -1);
 
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            this.Hide();
+        }
+
+        private void btnSelect_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var selectedMetric = button?.CommandParameter as PerformanceViewModel.Metric;
+
+            if (selectedMetric != null)
+            {
+                var viewModel = this.DataContext as PerformanceViewModel;
+                selectedMetric.OnMetricClicked(viewModel);
+            }
+        }
     }
 }
+
 
 PerformanceViewModel.cs
 ------------------------
@@ -608,138 +639,179 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
 
+
 namespace DTVPDProject.ViewModels
 {
     public class PerformanceViewModel : INotifyPropertyChanged
     {
+        private ObservableCollection<Metric> _metrics;
+        private SeriesCollection _seriesCollection;
+        private ChartValues<double> _lineChartValues;
+        private ChartValues<double> _barChartValues;
 
-        // Properties for Line Chart
-
+        // New properties
         private string _simulationId;
-            private DateTime _startTime;
-            private DateTime _endTime;
-            private string _status;
-            private ObservableCollection<Metric> _metrics;
-            private SeriesCollection _seriesCollection;
-            private ChartValues<double> _lineChartValues;
-            private ChartValues<double> _barChartValues;
+        private DateTime _startTime;
+        private DateTime _endTime;
+        private string _status;
 
-            public PerformanceViewModel()
+        public PerformanceViewModel()
+        {
+            // Initialize the metrics collection with default metrics
+            Metrics = new ObservableCollection<Metric>
             {
+                new Metric { MetricName = "Example Metric 1", MetricValue = 10, Unit = "Units" },
+                new Metric { MetricName = "Example Metric 2", MetricValue = 20, Unit = "Units" }
+                // Add more metrics as needed
+            };
 
-                Metrics = new ObservableCollection<Metric>();
-                SeriesCollection = new SeriesCollection();
-                LineChartValues = new ChartValues<double>();
-                BarChartValues = new ChartValues<double>();
+            SeriesCollection = new SeriesCollection();
+            LineChartValues = new ChartValues<double>();
+            BarChartValues = new ChartValues<double>();
 
-                // Initialize the chart configurations
-                var mapper = Mappers.Xy<double>()
-                    .X(x => x)
-                    .Y(x => x);
+            // Initialize the chart configurations
+            var mapper = Mappers.Xy<double>()
+                .X(x => x)
+                .Y(x => x);
 
-                Charting.For<double>(mapper);
-            }
+            Charting.For<double>(mapper);
 
-            public string SimulationId
+            // Set default values for other properties
+            SimulationId = "Simulation1";
+            StartTime = DateTime.Now;
+            EndTime = DateTime.Now.AddHours(1);
+            Status = "Completed"; // Set a default status
+        }
+
+        public ObservableCollection<Metric> Metrics
+        {
+            get { return _metrics; }
+            set
             {
-                get { return _simulationId; }
-                set
+                if (value == null)
                 {
-                    _simulationId = value;
-                    OnPropertyChanged();
+                    _metrics = new ObservableCollection<Metric>
+                    {
+                        new Metric { MetricName = "Default Metric", MetricValue = 0, Unit = "Units" }
+                    };
                 }
-            }
-
-            public DateTime StartTime
-            {
-                get { return _startTime; }
-                set
-                {
-                    _startTime = value;
-                    OnPropertyChanged();
-                }
-            }
-
-            public DateTime EndTime
-            {
-                get { return _endTime; }
-                set
-                {
-                    _endTime = value;
-                    OnPropertyChanged();
-                }
-            }
-
-            public string Status
-            {
-                get { return _status; }
-                set
-                {
-                    _status = value;
-                    OnPropertyChanged();
-                }
-            }
-
-            public ObservableCollection<Metric> Metrics
-            {
-                get { return _metrics; }
-                set
+                else
                 {
                     _metrics = value;
-                    OnPropertyChanged();
                 }
+                OnPropertyChanged();
             }
+        }
 
-            public SeriesCollection SeriesCollection
+        public SeriesCollection SeriesCollection
+        {
+            get { return _seriesCollection; }
+            set
             {
-                get { return _seriesCollection; }
-                set
-                {
-                    _seriesCollection = value;
-                    OnPropertyChanged();
-                }
+                _seriesCollection = value;
+                OnPropertyChanged();
             }
+        }
 
-            public ChartValues<double> LineChartValues
+        public ChartValues<double> LineChartValues
+        {
+            get { return _lineChartValues; }
+            set
             {
-                get { return _lineChartValues; }
-                set
-                {
-                    _lineChartValues = value;
-                    OnPropertyChanged();
-                }
+                _lineChartValues = value;
+                OnPropertyChanged();
             }
+        }
 
-            public ChartValues<double> BarChartValues
+        public ChartValues<double> BarChartValues
+        {
+            get { return _barChartValues; }
+            set
             {
-                get { return _barChartValues; }
-                set
-                {
-                    _barChartValues = value;
-                    OnPropertyChanged();
-                }
+                _barChartValues = value;
+                OnPropertyChanged();
             }
+        }
 
-            public ICommand ShowLineChartCommand { get; set; }
-            public ICommand ShowBarChartCommand { get; set; }
-            public ICommand Show3DRenderingCommand { get; set; }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        // New Properties
+        public string SimulationId
+        {
+            get { return _simulationId; }
+            set
             {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                _simulationId = value;
+                OnPropertyChanged();
             }
+        }
+
+        public DateTime StartTime
+        {
+            get { return _startTime; }
+            set
+            {
+                _startTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public DateTime EndTime
+        {
+            get { return _endTime; }
+            set
+            {
+                _endTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string Status
+        {
+            get { return _status; }
+            set
+            {
+                _status = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public class Metric
         {
             public string MetricName { get; set; }
-            public double MetricValue { get; set; }
+            public int MetricValue { get; set; }
             public string Unit { get; set; }
+
+            // Add a command or method to handle clicks
+            public void OnMetricClicked(PerformanceViewModel viewModel)
+            {
+                // Update the charts based on the clicked metric
+                viewModel.UpdateCharts(this);
+            }
+        }
+
+     
+            private void UpdateCharts(Metric metric)
+            {
+                // Clear existing chart values
+                LineChartValues.Clear();
+                BarChartValues.Clear();
+
+                // Example logic to populate the charts based on the clicked metric
+                // In this case, we will just add the MetricValue to both charts for demonstration.
+                LineChartValues.Add(metric.MetricValue); // Add to line chart
+                BarChartValues.Add(metric.MetricValue);  // Add to bar chart
+
+                // Optionally, you can add more complex logic here based on the metric's properties.
+                // For instance, you could set different values or configurations based on the metric name.
+            }
         }
     }
-
 
 
 
